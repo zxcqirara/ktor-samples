@@ -9,20 +9,20 @@ import io.ktor.util.*
  * Adds custom header.
  */
 class CustomHeader(configuration: Configuration) {
-    // get an immutable snapshot of a configuration values
+    // Get an immutable snapshot of a configuration values.
     private val name = configuration.headerName
     private val value = configuration.headerValue
 
-    // Feature configuration class
+    // Feature configuration class.
     class Configuration {
-        // mutable properties with default values so user can modify it
+        // Mutable properties with default values so user can modify it.
         var headerName = "Custom"
         var headerValue = "Value"
     }
 
-    // Body of the feature
+    // Body of the feature.
     private fun intercept(context: PipelineContext<Unit, ApplicationCall>) {
-        // Add custom header to the response
+        // Add custom header to the response.
         context.call.response.header(name, value)
     }
 
