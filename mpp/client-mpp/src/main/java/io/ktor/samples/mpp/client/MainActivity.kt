@@ -4,7 +4,6 @@ import android.os.*
 import android.support.v7.app.*
 import android.widget.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.android.*
 
 class MainActivity : AppCompatActivity() {
 

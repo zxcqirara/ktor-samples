@@ -1,3 +1,5 @@
+import proguard.gradle.ProGuardTask
+
 buildscript {
     repositories {
         jcenter()
@@ -6,7 +8,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "net.sf.proguard:proguard-gradle:$proguard_version"
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.0.0"
     }
 }
 
@@ -35,12 +37,12 @@ dependencies {
 }
 
 shadowJar {
-    baseName = 'my-application'
-    classifier = null
+    archiveBaseName = 'my-application'
+    archiveClassifier = null
     version = null
 }
 
-task minimizedJar(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
+task minimizedJar(type: ProGuardTask, dependsOn: shadowJar) {
     injars "build/libs/my-application.jar"
     outjars "build/libs/my-application.min.jar"
     libraryjars System.properties.'java.home' + "/lib/rt.jar"
