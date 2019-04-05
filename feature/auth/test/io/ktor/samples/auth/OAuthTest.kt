@@ -5,10 +5,11 @@ import io.ktor.client.engine.mock.*
 import io.ktor.content.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import kotlinx.coroutines.io.*
+import io.ktor.util.*
 import org.junit.Test
 import kotlin.test.*
 
+@UseExperimental(InternalAPI::class)
 class OAuthTest {
     @Test
     fun testOAuthLogin() {
@@ -18,31 +19,21 @@ class OAuthTest {
             val mockEngine = MockEngine { request ->
                 when (request.url.fullUrl) {
                     "https://www.googleapis.com/oauth2/v3/token" -> {
-                        MockHttpResponse(
-                            this,
-                            HttpStatusCode.OK,
-                            ByteReadChannel("Hello World!".toByteArray(Charsets.UTF_8)),
-                            headersOf("Content-Type" to listOf(ContentType.Text.Plain.toString()))
-                        )
-
-                        val textContent = request.content as TextContent
+                        val textContent = request.body as TextContent
                         assertEquals(ContentType.Application.FormUrlEncoded, textContent.contentType)
                         assertEquals(
                             "client_id=%2A%2A%2A.apps.googleusercontent.com&client_secret=%2A%2A%2A&grant_type=authorization_code&state=$state&code=mycode&redirect_uri=http%3A%2F%2F127.0.0.1%2Flogin%2Fgoogle",
                             textContent.text
                         )
-                        MockHttpResponse(
-                            this,
-                            HttpStatusCode.OK,
-                            ByteReadChannel(
-                                """{
+                        val content = """{
                                     "access_token": "myaccesstoken",
                                     "token_type": "mytokentype",
                                     "expires_in": 3600,
                                     "refresh_token": "myrefreshtoken"
-                                }""".trimIndent().toByteArray()
-                            ),
-                            headersOf(
+                                }""".trimIndent()
+
+                        respond(
+                            content, headers = headersOf(
                                 HttpHeaders.ContentType to listOf(ContentType.Application.Json.toString())
                             )
                         )
@@ -69,22 +60,22 @@ class OAuthTest {
                 state = stateInfo!!.groupValues[1]
             }
 
-            handleRequest(HttpMethod.Get, "/login/google?state=$state&code=mycode") {
-                addHeader("Host", "127.0.0.1")
-            }.let { call ->
-                assertEquals("""
-                    <!DOCTYPE html>
-                    <html>
-                      <head>
-                        <title>Logged in</title>
-                      </head>
-                      <body>
-                        <h1>You are logged in</h1>
-                        <p>Your token is OAuth2(accessToken=myaccesstoken, tokenType=mytokentype, expiresIn=3600, refreshToken=myrefreshtoken, extraParameters=Parameters [access_token=[myaccesstoken], refresh_token=[myrefreshtoken], token_type=[mytokentype], expires_in=[3600]])</p>
-                      </body>
-                    </html>
-                """.trimIndent(), call.response.content?.trim())
-            }
+            assertEquals(
+                """
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>Logged in</title>
+                  </head>
+                  <body>
+                    <h1>You are logged in</h1>
+                    <p>Your token is OAuth2(accessToken=myaccesstoken, tokenType=mytokentype, expiresIn=3600, refreshToken=myrefreshtoken, extraParameters=Parameters [access_token=[myaccesstoken], refresh_token=[myrefreshtoken], token_type=[mytokentype], expires_in=[3600]])</p>
+                  </body>
+                </html>
+            """.trimIndent(), handleRequest(HttpMethod.Get, "/login/google?state=$state&code=mycode") {
+                    addHeader("Host", "127.0.0.1")
+                }.response.content?.trim()
+            )
         }
     }
 }
