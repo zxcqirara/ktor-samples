@@ -96,12 +96,18 @@ if (ktorRepositoryDir.exists()) {
     allprojects {
         repositories {
             maven { url ktorRepositoryDir.absolutePath }
+            mavenCentral()
+            jcenter()
+            google()
         }
     }
 } else {
    allprojects {
         repositories {
             mavenLocal()
+            mavenCentral()
+            jcenter()
+            google()
         }
    }
 }

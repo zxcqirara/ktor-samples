@@ -13,6 +13,7 @@ module('app', 'chat')
 module('app', 'httpbin')
 module('app', 'kweet')
 module('app', 'youkube')
+module('app', 'android-app')
 
 module('deployment', 'netty')
 module('deployment', 'netty-embedded')
