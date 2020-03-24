@@ -9,7 +9,6 @@ kotlin {
                 dependencies {
                     implementation "io.ktor:ktor-client-okhttp:1.3.2-SNAPSHOT"
                     implementation "io.ktor:ktor-client-tracing-jvm:1.3.2-SNAPSHOT"
-                    implementation "io.ktor:ktor-client-tracing-stetho-android:1.3.2-SNAPSHOT"
                     implementation "io.ktor:ktor-client-serialization:1.3.2-SNAPSHOT"
                     implementation "io.ktor:ktor-client-logging:1.3.2-SNAPSHOT"
                     implementation "io.ktor:ktor-client-json:1.3.2-SNAPSHOT"
@@ -39,11 +38,8 @@ android {
     }
 
     buildTypes {
-        debug {
-            matchingFallbacks = ['release']
-        }
+        debug {}
         release {
-            matchingFallbacks = ['debug']
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -71,4 +67,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    debugImplementation("io.ktor:ktor-client-tracing-stetho-android-debug:1.3.2-SNAPSHOT")
+    releaseImplementation("io.ktor:ktor-client-tracing-stetho-android:1.3.2-SNAPSHOT")
 }
