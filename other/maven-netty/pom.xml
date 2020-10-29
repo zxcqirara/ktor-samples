@@ -42,6 +42,10 @@
             <id>kotlin-dev</id>
             <url>https://kotlin.bintray.com/kotlin-dev</url>
         </repository>
+        <repository>
+            <id>dev</id>
+            <url>https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -64,6 +68,10 @@
         <pluginRepository>
             <id>kotlin-dev</id>
             <url>https://kotlin.bintray.com/kotlin-dev</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>dev</id>
+            <url>https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev</url>
         </pluginRepository>
     </pluginRepositories>
 
