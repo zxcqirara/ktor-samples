@@ -1,0 +1,59 @@
+body {
+    font-family: Calibri, serif;
+}
+
+h1, h2, h3 {
+    font-family: Roboto, sans-serif;
+}
+
+main {
+    width: 600px;
+    margin-left: 50px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form > * {
+    margin-bottom: 15px;
+}
+
+input {
+    font-size: 15px;
+}
+
+input[type=submit] {
+    margin-top: 10px;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #f26636;
+}
+
+.username {
+    color: #f26636;
+}
+
+a {
+    color: #6373ff;
+    text-decoration: none;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header a {
+    align-self: center;
+}

@@ -1,0 +1,23 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Openid Connect Sample</title>
+    <link href="/style.css" rel="stylesheet">
+</head>
+
+<body>
+<main>
+    <div class="header">
+        <h1>Provider settings</h1>
+    </div>
+
+    <form class="form" method="post" action="/login">
+        <label th:each="input: ${inputs}">
+            <span th:text="${input.title}"></span>
+            <input type="text" th:name="${input.name}" th:value="${input.value}" th:readonly="${input.readonly}" >
+        </label>
+
+        <input type="submit" value="Authorize">
+    </form>
+</main>
+</body>
+</html>
