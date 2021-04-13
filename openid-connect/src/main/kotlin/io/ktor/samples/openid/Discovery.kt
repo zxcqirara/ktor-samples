@@ -2,6 +2,7 @@ package io.ktor.samples.openid
 
 import io.ktor.auth.*
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -23,7 +24,11 @@ data class DiscoveryResponse(
 )
 
 suspend fun HttpClient.discoverSettings(url: String): DiscoveryResponse {
-    return get<HttpStatement>(url).receive()
+    try {
+        return get<HttpStatement>(url).receive()
+    } catch (cause: ClientRequestException) {
+        throw Exception("Unable to dynamically discover information about OpenID Provider by URL $url", cause)
+    }
 }
 
 fun getProvider(discoveryResponse: DiscoveryResponse, clientId: String, clientSecret: String): OAuthServerSettings.OAuth2ServerSettings {

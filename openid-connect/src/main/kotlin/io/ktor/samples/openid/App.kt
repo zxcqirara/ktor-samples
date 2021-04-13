@@ -6,6 +6,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
@@ -18,10 +19,12 @@ import kotlinx.coroutines.runBlocking
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 val clientId = System.getenv("CLIENT_ID") ?: error("Expected env variable CLIENT_ID")
-val clientSecret = System.getenv("CLIENT_SECRET") ?: error("Expected env variable CLIENT_SECRET")
+val clientSecret = System.getenv("CLIENT_SECRET") ?: error("Expected env variable CLIENT_SECRET") // TODO: Process 401 response
 val discoveryURL = System.getenv("DISCOVERY_URL") ?: error("Expected env variable DISCOVERY_URL")
+const val callbackPath = "/callback" // TODO: Print URL before starting the server
 
 suspend fun HttpClient.providerInfo() = getProvider(discoverSettings(discoveryURL), clientId, clientSecret)
+fun ApplicationCall.callbackURL(): String = urlWithPath(callbackPath).toString()
 
 fun main() {
     val httpClient = HttpClient(Apache) {
@@ -30,7 +33,7 @@ fun main() {
         }
     }
 
-    embeddedServer(CIO, port = 7070) {
+    embeddedServer(CIO, host = "127.0.0.1", port = 7070) {
         install(Authentication) {
             oauth("keycloak") {
                 client = httpClient
@@ -39,7 +42,9 @@ fun main() {
                         httpClient.providerInfo()
                     }
                 }
-                urlProvider = { "http://127.0.0.1:7070/callback" } // TODO determine host and port
+                urlProvider = {
+                    callbackURL()
+                }
             }
         }
 
@@ -55,12 +60,13 @@ fun main() {
         routing {
             get("/") {
                 val provider = httpClient.providerInfo()
-
+                // TODO Refactor templates
                 call.respond(ThymeleafContent("index", mapOf("inputs" to listOf(
                     Input(title = "Client ID", value = provider.clientId),
                     Input(title = "Client Secret", value = provider.clientSecret),
                     Input(title = "Authorization URL", value = provider.authorizeUrl),
                     Input(title = "Token Request URL", value = provider.accessTokenUrl),
+                    Input(title = "Callback URL", value = call.callbackURL()),
                     Input(title = "Scopes", value = provider.defaultScopes.joinToString(separator = ", ")),
                 ))))
             }
@@ -86,7 +92,7 @@ fun main() {
             authenticate("keycloak") {
                 post("/login") {}
 
-                get("/callback") { // TODO use here the same source for urlProvider
+                get(callbackPath) {
                     val principal = call.authentication.principal<OAuthAccessTokenResponse.OAuth2>()
                     val idToken = principal?.extraParameters?.get("id_token") ?: error("id_token not found in the response")
 
